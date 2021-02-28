@@ -3,13 +3,13 @@ const Discord = require('discord.js');
 const _ = require('underscore');
 const config = require('./config/config.js');
 const client = new Discord.Client();
-
 // const config = require('./bot-config.js');
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}`);
 	const guilds = client.guilds.cache.map(guild => guild.name);
 	console.log(guilds);
+
 });
 
 client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
@@ -20,10 +20,16 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 
 	if (newUserChannel && oldUserChannel == null) {
 		console.log('i think is join');
-		oldVoiceState.member.roles.add([config.inVoiceRole]).catch(console.error);
+		if (newUserChannel.parent && newUserChannel.parent.id == config.channelCategory) {
+			oldVoiceState.member.roles.add([config.inVoiceRole]).catch(console.error);
+		}
 	}
 	else if (newUserChannel && oldUserChannel && oldUserChannel != newUserChannel) {
 		console.log('i think is move channels');
+		if(newUserChannel.parent && newUserChannel.parent.id != config.channel.channelCategory) {
+			oldVoiceState.member.roles.remove([config.inVoiceRole]).catch(console.error);
+			console.log('i think is move out of category?');
+		}
 	}
 	else if (newUserChannel == null && oldUserChannel != null) {
 		console.log('i think is leave');
@@ -32,18 +38,19 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 	else {
 		console.log('i think is something else (mute/unmute/share, etc.)');
 	}
-
-	// Check if there are no other users connected to voice. If so, wipe the content of the #in-voice text channel
+	// Check if there are no other users connected to voice chats that sit underneath the category. If so, wipe the content of the #in-voice text channel
 	var hasConnected = false;
-	if (oldVoiceState.member.guild.members.cache.some(function(member) {
-		if (member.voice.channelID) {
-			return true;
+	var channel = oldVoiceState.member.guild.channels.cache.get(config.inVoiceTextChannel);
+	var category = channel.parent;
+	var categoryVoiceChannels = category.children;
+
+	for (var child in categoryVoiceChannels) {
+		if(child.type === 'voice' && child.members.length > 0) {
+			hasConnected = true;
+			break;
 		}
-	})) {
-		hasConnected = true;
 	}
 	if (!hasConnected) {
-		var channel = oldVoiceState.member.guild.channels.cache.get(config.inVoiceTextChannel);
 		wipe(channel);
 	}
 });
