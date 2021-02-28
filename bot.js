@@ -32,7 +32,7 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 		}
 		if(newVoiceState.channel.parent && newVoiceState.channel.parent.id == config.channelCategory) {
 			oldVoiceState.member.roles.add([config.inVoiceRole]).catch(console.error);
-			console.log('i think is move out of category?');
+			console.log('i think is move within category?');
 		}
 	}
 	else if (newUserChannel == null && oldUserChannel != null) {
@@ -42,20 +42,12 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 	else {
 		console.log('i think is something else (mute/unmute/share, etc.)');
 	}
-	// Check if there are no other users connected to voice chats that sit underneath the category. If so, wipe the content of the #in-voice text channel
-	var hasConnected = false;
-	var channel = oldVoiceState.member.guild.channels.cache.get(config.inVoiceTextChannel);
-	var category = channel.parent;
-	var categoryVoiceChannels = category.children;
+});
 
-	for (var child in categoryVoiceChannels) {
-		if(child.type === 'voice' && child.members.length > 0) {
-			hasConnected = true;
-			break;
-		}
-	}
-	if (!hasConnected) {
-		wipe(channel);
+client.on('message', function(message) {
+	if (message.content === '.wipe') {
+		wipe(client.channels.cache.get(config.inVoiceTextChannel));
+		console.log(`channel wiped by ${message.author.username}`);
 	}
 });
 
