@@ -1,3 +1,5 @@
 const _ = require('underscore');
 
-module.exports = _.extend(require('./environments/production.json'));
+
+// Create a copy of the production.json environments file and fill with the appropriate values.
+module.exports = _.extend(require('./environments/local.json'));
