@@ -20,14 +20,18 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 
 	if (newUserChannel && oldUserChannel == null) {
 		console.log('i think is join');
-		if (newUserChannel.parent && newUserChannel.parent.id == config.channelCategory) {
+		if (newVoiceState.channel.parent && newVoiceState.channel.parent.id == config.channelCategory) {
 			oldVoiceState.member.roles.add([config.inVoiceRole]).catch(console.error);
 		}
 	}
 	else if (newUserChannel && oldUserChannel && oldUserChannel != newUserChannel) {
 		console.log('i think is move channels');
-		if(newUserChannel.parent && newUserChannel.parent.id != config.channel.channelCategory) {
+		if(newVoiceState.channel.parent && newVoiceState.channel.parent.id != config.channelCategory) {
 			oldVoiceState.member.roles.remove([config.inVoiceRole]).catch(console.error);
+			console.log('i think is move out of category?');
+		}
+		if(newVoiceState.channel.parent && newVoiceState.channel.parent.id == config.channelCategory) {
+			oldVoiceState.member.roles.add([config.inVoiceRole]).catch(console.error);
 			console.log('i think is move out of category?');
 		}
 	}
