@@ -2,5 +2,9 @@
     "botToken": "",
     "channelCategory": "",
     "inVoiceRole": "",
-    "inVoiceTextChannel": ""
+    "inVoiceTextChannel": "",
+    "logFilePath": "",
+    "pastebinAPIKey" : "",
+    "pastebinUsername" : "",
+    "pastebinPassword" : ""
 }

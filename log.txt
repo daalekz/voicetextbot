@@ -1,0 +1,27 @@
+Wed 10 Mar 2021 02:09:53: i think is something else (mute/unmute/share, etc.)
+Wed 10 Mar 2021 02:09:53: i think is something else (mute/unmute/share, etc.)
+Wed 10 Mar 2021 02:09:58: Logs requested by daalekz
+Wed 10 Mar 2021 02:10:29: Error in hastebin upload: ParseError: Unexpected token '<' at 1:1 in https://hastebin.com/documents
+<!DOCTYPE html>
+^
+Wed 10 Mar 2021 02:10:54: ------- Warming up -------
+Wed 10 Mar 2021 02:10:54: Logged in as mikey#4839
+Wed 10 Mar 2021 02:10:54: Corgi Appreciation Society
+Wed 10 Mar 2021 02:10:54: ------- Finished warmup -------
+Wed 10 Mar 2021 02:10:57: Logs requested by daalekz
+Wed 10 Mar 2021 02:11:28: Error in hastebin upload: ParseError: Unexpected token '<' at 1:1 in https://hastebin.com/documents
+<!DOCTYPE html>
+^
+Wed 10 Mar 2021 02:12:36: ------- Warming up -------
+Wed 10 Mar 2021 02:12:36: Logged in as mikey#4839
+Wed 10 Mar 2021 02:12:36: Corgi Appreciation Society
+Wed 10 Mar 2021 02:12:36: ------- Finished warmup -------
+Wed 10 Mar 2021 02:12:38: Logs requested by daalekz
+Wed 10 Mar 2021 02:13:09: Error in hastebin upload: ParseError: Unexpected token '<' at 1:1 in https://hastebin.com/documents
+<!DOCTYPE html>
+^
+Wed 10 Mar 2021 02:37:45: ------- Warming up -------
+Wed 10 Mar 2021 02:37:45: Logged in as mikey#4839
+Wed 10 Mar 2021 02:37:45: Corgi Appreciation Society
+Wed 10 Mar 2021 02:37:45: ------- Finished warmup -------
+Wed 10 Mar 2021 02:38:00: Logs requested by daalekz
