@@ -44,7 +44,7 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 		oldVoiceState.member.roles.remove([config.inVoiceRole]).catch(console.error);
 	}
 	else {
-		appendLine('i think is something else (mute/unmute/share, etc.)');
+		appendLine(`${oldVoiceState.member.user.username} mute/unmute/share, etc.`);
 	}
 });
 
@@ -69,12 +69,15 @@ client.on('message', function(message) {
 });
 
 async function wipe(channel) {
-	var msg_size = 100;
-	while (msg_size == 100) {
-		await channel.bulkDelete(100)
-			.then(messages => msg_size = messages.size)
-			.catch(console.error);
-	}
+	var msg_size = 100;	
+	do {
+		console.log(msg_size);
+		var fetched = await channel.messages.fetch({ limit: 100 });
+		var notPinned = fetched.filter(fetchedMsg => !fetchedMsg.pinned);
+		await channel.bulkDelete(notPinned, true)
+		.then(messages => msg_size = messages.size)
+		.catch(console.error);
+	} while (msg_size == 100);
 }
 
 async function isInCategory(channel) {
@@ -85,27 +88,6 @@ async function isInCategory(channel) {
 function appendLine(message, timestamp = date.format(new Date(), 'ddd DD MMM YYYY hh:mm:ss')) {
 	log.write(`${timestamp}: ${message}\n`);
 	console.log(message);
-}
-
-function uploadLogs(message) {
-	// 0=public, 1=unlisted, 2=private
-	const privateValue = 2;
-	const pastebin = new PastebinAPI({
-		'api_dev_key' : config.pastebinAPIKey,
-		'api_user_name' : config.pastebinUsername,
-		'api_user_password' : config.pastebinPassword,
-		'api_paste_private' : privateValue
-	});
-	pastebin.createPasteFromFile({
-		'file': config.logFilePath,
-		'title': `logs ${getdateTime()}`
-	})
-		.then((data) => {
-			message.reply(`your logs are available here: ${data}`);
-		})
-		.catch((err) => {
-			appendLine(`Error in pastebin upload: ${err}`);
-		});
 }
 function openLog() {
 	log = fs.createWriteStream(config.logFilePath, { flags: 'a' });
