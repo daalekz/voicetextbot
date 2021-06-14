@@ -17,9 +17,9 @@ Available Commands:
 - admin only: `.shutdown`
 - `.wipe` 
   - will delete all messages in the channel configured under 'inVoiceTextChannel' in config. Can only be called from that channel.
+  - will skip pinned messages 
 
 Future feature ideas:
-- (priority, actually planning to do this one) Automatically `.wipe` the channel when everyone has left relevant voice chats.
 - Friends-in-voice auto ping feature 
  configurable per-user 
 Feature ideas (contd. -Nice to haves): 
