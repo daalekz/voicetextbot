@@ -60,12 +60,6 @@ client.on('message', function(message) {
 		log.end();
 		client.destroy();
 	}
-	if (message.content === '.logs' && message.member.hasPermission('ADMINISTRATOR')) {
-		log.end();
-		uploadLogs(message);
-		openLog();
-		appendLine(`Logs requested by ${message.member.user.username}`);
-	}
 });
 
 async function wipe(channel) {
@@ -82,26 +76,6 @@ function appendLine(message, timestamp = date.format(new Date(), 'ddd DD MMM YYY
 	console.log(message);
 }
 
-function uploadLogs(message) {
-	// 0=public, 1=unlisted, 2=private
-	const privateValue = 1;
-	const pastebin = new PastebinAPI({
-		'api_dev_key' : config.pastebinAPIKey,
-		'api_user_name' : config.pastebinUsername,
-		'api_user_password' : config.pastebinPassword,
-		'api_paste_private' : privateValue
-	});
-	pastebin.createPasteFromFile({
-		'file': config.logFilePath,
-		'title': `logs ${getdateTime()}`
-	})
-		.then((data) => {
-			message.reply(`your logs are available here: ${data}`);
-		})
-		.catch((err) => {
-			appendLine(`Error in hastebin upload: ${err}`);
-		});
-}
 function openLog() {
 	log = fs.createWriteStream(config.logFilePath, { flags: 'a' });
 }
