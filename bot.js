@@ -1,12 +1,10 @@
 /* eslint-disable comma-dangle */
 /* eslint-disable no-var */
 const Discord = require('discord.js');
-const _ = require('underscore');
 const config = require('./config/config.js');
 const date = require('date-and-time');
 const fs = require('fs');
 const client = new Discord.Client();
-const PastebinAPI = require('pastebin-ts');
 var log = null;
 
 client.on('ready', () => {
@@ -44,7 +42,7 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 		oldVoiceState.member.roles.remove([config.inVoiceRole]).catch(console.error);
 	}
 	else {
-		appendLine('i think is something else (mute/unmute/share, etc.)');
+		appendLine(`${oldVoiceState.member.user.username} mute/unmute/share, etc.`);
 	}
 });
 
@@ -64,22 +62,23 @@ client.on('message', function(message) {
 
 async function wipe(channel) {
 	var msg_size = 100;
-	while (msg_size == 100) {
-		await channel.bulkDelete(100)
+	do {
+		console.log(msg_size);
+		var fetched = await channel.messages.fetch({ limit: 100 });
+		var notPinned = fetched.filter(fetchedMsg => !fetchedMsg.pinned);
+		await channel.bulkDelete(notPinned, true)
 			.then(messages => msg_size = messages.size)
 			.catch(console.error);
-	}
+	} while (msg_size == 100);
 }
+
 
 function appendLine(message, timestamp = date.format(new Date(), 'ddd DD MMM YYYY hh:mm:ss')) {
 	log.write(`${timestamp}: ${message}\n`);
 	console.log(message);
 }
-
 function openLog() {
 	log = fs.createWriteStream(config.logFilePath, { flags: 'a' });
 }
-function getdateTime() {
-	return date.format(new Date(), 'ddd DD MMM YYYY hh:mm:ss');
-}
+
 client.login(config.botToken);
