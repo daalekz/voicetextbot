@@ -56,11 +56,12 @@ client.on('message', function(message) {
 	}
 	// graceful shutdown - admin only
 	if (message.content === '.shutdown' && message.member.hasPermission('ADMINISTRATOR')) {
-		sysLog.end();
-		spotifyLog.end();
-		client.destroy();
-		message.react('👋');
-		return;
+		message.react('👋').then (() => {
+			sysLog.end();
+			spotifyLog.end();
+			client.destroy();
+			return;
+		});
 	}
 	if (message.channel == config.bopOfTheDayChannel) {
 		tryParseSongIntoList(message);
@@ -69,17 +70,6 @@ client.on('message', function(message) {
 });
 
 async function wipe(channel) {
-	var msg_size = 100;
-	do {
-		console.log(msg_size);
-		var fetched = await channel.messages.fetch({ limit: 100 });
-		var notPinned = fetched.filter(fetchedMsg => !fetchedMsg.pinned);
-		await channel.bulkDelete(notPinned, true)
-			.then(messages => msg_size = messages.size)
-			.catch(console.error);
-	} while (msg_size == 100);
-}
-async function yoink(channel) {
 	var msg_size = 100;
 	do {
 		console.log(msg_size);
