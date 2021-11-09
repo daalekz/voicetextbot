@@ -96,9 +96,9 @@ async function tryParseSongIntoList(message) {
 	// eslint-disable-next-line no-useless-escape
 	const regex = '(https:\/\/open.spotify.com\/track\/[A-Za-z0-9]{22})';
 	var found = messageContent.match(regex);
-	if (found.length > 0) {
-		found.forEach((element) => {
-			// Do something with each element
+	const uniqueSongs = [... new Set(found)];
+	if (uniqueSongs.length > 0) {
+		uniqueSongs.forEach((element) => {
 			appendSpotifyLog(element);
 		});
 		message.react('✅');
