@@ -54,6 +54,11 @@ client.on('message', function(message) {
 		message.channel.send('Welcome to the In-Voice text channel. You may use the `.wipe` command to wipe the contents of this channel at any time. Further improvements to the bot (including auto-wiping on empty voice channels) will be added progressively. ');
 		return;
 	}
+	if (message.content === '.wipe' && message.member.hasPermission('ADMINISTRATOR')) {
+		wipe(message.channel);
+		appendSysLog(`channel ${message.channel.name} wiped by ${message.author.username} at ${message.createdAt}`);
+		return;
+	}
 	// graceful shutdown - admin only
 	if (message.content === '.shutdown' && message.member.hasPermission('ADMINISTRATOR')) {
 		message.react('👋').then (() => {
