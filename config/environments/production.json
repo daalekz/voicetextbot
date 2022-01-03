@@ -7,5 +7,13 @@
     "logFilePathSpotify": "",
     "pastebinAPIKey" : "",
     "pastebinUsername" : "",
-    "pastebinPassword" : ""
+    "pastebinPassword" : "",
+    "dbCredentials" : {
+        "host" : "",
+        "user" : "",
+        "password" : "",
+        "database" : "",
+        "port": "",
+        "table": ""
+    }
 }

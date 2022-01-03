@@ -13,6 +13,8 @@
     "discord.js": "^12.5.1",
     "eslint": "^6.8.0",
     "hastebin": "^0.2.1",
+    "mysql": "^2.18.1",
+    "node-schedule": "^2.1.0",
     "pastebin-ts": "^1.2.0",
     "spotify-web-api-node": "^5.0.2",
     "underscore": "^1.13.1"
