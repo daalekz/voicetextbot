@@ -1,16 +1,24 @@
-/* eslint-disable comma-dangle */
 /* eslint-disable no-var */
-const Discord = require('discord.js');
-const config = require('./config/config.js');
-const date = require('date-and-time');
-const fs = require('fs');
-const client = new Discord.Client();
-var sysLog = null;
-var spotifyLog = null;
+const Discord = require('discord.js'),
+	config = require('./config/config.js'),
+	perms = config.permissions,
+	glob = require('glob'),
+	path = require('path'),
+	fs = require('fs'),
+	{ appendSysLog } = require('./utils.js'),
+	client = new Discord.Client();
+
+client.prefix = config.prefix;
+client.commands = new Discord.Collection();
+const cooldowns = new Discord.Collection();
+
+glob.sync('./commands/*.js').forEach(function(file) {
+	const command = require(path.resolve(file));
+	client.commands.set(command.name, command);
+});
+
 
 client.on('ready', () => {
-	// setting up logging
-	openLog();
 	appendSysLog('------- Warming up -------');
 	appendSysLog(`Logged in as ${client.user.tag}`);
 	const guilds = client.guilds.cache.map(guild => guild.name);
@@ -42,49 +50,69 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 		appendSysLog(`${oldVoiceState.member.user.username} has left ${oldVoiceState.channel.name}`);
 		oldVoiceState.member.roles.remove([config.inVoiceRole]).catch(console.error);
 	}
-	else {
-		appendSysLog(`${oldVoiceState.member.user.username} mute/unmute/share, etc.`);
-	}
 });
 
 client.on('message', function(message) {
-	if (message.content === '.wipe' && message.channel == config.inVoiceTextChannel) {
-		wipe(client.channels.cache.get(config.inVoiceTextChannel));
-		appendSysLog(`channel wiped by ${message.author.username} at ${message.createdAt}`);
-		message.channel.send('Welcome to the In-Voice text channel. You may use the `.wipe` command to wipe the contents of this channel at any time. Further improvements to the bot (including auto-wiping on empty voice channels) will be added progressively. ');
-		return;
-	}
-	if (message.content === '.wipe' && message.member.hasPermission('ADMINISTRATOR')) {
-		wipe(message.channel);
-		appendSysLog(`channel ${message.channel.name} wiped by ${message.author.username} at ${message.createdAt}`);
-		return;
-	}
-	// graceful shutdown - admin only
-	if (message.content === '.shutdown' && message.member.hasPermission('ADMINISTRATOR')) {
-		message.react('👋').then (() => {
-			sysLog.end();
-			spotifyLog.end();
-			client.destroy();
-			return;
-		});
-	}
 	if (message.channel == config.bopOfTheDayChannel) {
 		tryParseSongIntoList(message);
 		return;
 	}
+	if(message.channel.type === 'DM') return;
+	if(!message.content.startsWith(client.prefix) || message.author.bot) return;
+	const args = message.content.slice(client.prefix.length).trim().split(/ +/);
+	const commandName = args.shift().toLowerCase();
+	const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+
+	if(!command) return;
+	if(command.channels && !command.channels.includes(message.channel.id)) return;
+
+	const userPerms = [];
+	const roles = message.member.roles.cache.map(r => r.id);
+	for(const role in perms) {
+		if(roles.some(r=> perms[role].includes(r))) {
+			userPerms.push(role);
+		}
+	}
+	if(!command.permissions || command.permissions.some(p=> userPerms.includes(p))) {
+		if (!cooldowns.has(command.name)) {
+			cooldowns.set(command.name, new Discord.Collection());
+		}
+
+		const now = Date.now();
+		const timestamps = cooldowns.get(command.name);
+		const cooldownlength = (command.cooldown || 2) * 1000;
+
+		if(timestamps.has(message.author.id)) {
+			const expiration = timestamps.get(message.author.id) + cooldownlength;
+			if(now < expiration) {
+				const timeLeft = (expiration - now) / 1000;
+				return message.reply(`⌛ That command is on cooldown, Please wait ${timeLeft.toFixed(1)} seconds before trying again.`);
+			}
+		}
+		timestamps.set(message.author.id, now);
+
+		const cooldownTimeout = setTimeout(() => timestamps.delete(message.author.id), cooldownlength);
+
+		// execute command
+		try {
+			// command returns true if successful, false if user error
+			const commandSuccess = command.execute(message, args, client, userPerms);
+
+			// clear user cooldown if command was unsuccessful
+			if(typeof commandSuccess === 'boolean' && commandSuccess === false) {
+				timestamps.delete(message.author.id);
+				clearTimeout(cooldownTimeout);
+			}
+		}
+		catch (err) {
+			appendSysLog(err);
+		}
+	}
+	else{
+		message.reply('You don\'t have the permissions for that');
+	}
 });
 
-async function wipe(channel) {
-	var msg_size = 100;
-	do {
-		console.log(msg_size);
-		var fetched = await channel.messages.fetch({ limit: 100 });
-		var notPinned = fetched.filter(fetchedMsg => !fetchedMsg.pinned);
-		await channel.bulkDelete(notPinned, true)
-			.then(messages => msg_size = messages.size)
-			.catch(console.error);
-	} while (msg_size == 100);
-}
 
 async function tryParseSongIntoList(message) {
 	var messageContent = message.content;
@@ -100,18 +128,10 @@ async function tryParseSongIntoList(message) {
 	}
 }
 
-function appendSysLog(message, timestamp = date.format(new Date(), 'ddd DD MMM YYYY hh:mm:ss')) {
-	sysLog.write(`${timestamp}: ${message}\n`);
-	console.log(message);
-}
-
 function appendSpotifyLog(song) {
+	const spotifyLog = fs.createWriteStream(config.logFilePathSpotify, { flags: 'a' });
 	spotifyLog.write(`${song}\n`);
-}
-
-function openLog() {
-	sysLog = fs.createWriteStream(config.logFilePath, { flags: 'a' });
-	spotifyLog = fs.createWriteStream(config.logFilePathSpotify, { flags: 'a' });
+	spotifyLog.end();
 }
 
 client.login(config.botToken);
