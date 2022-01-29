@@ -5,11 +5,14 @@
     "inVoiceTextChannel": "",
     "logFilePath": "",
     "logFilePathSpotify": "",
-    "pastebinAPIKey" : "",
-    "pastebinUsername" : "",
-    "pastebinPassword" : "",
-    "prefix" : "..",
-    "permissions" : {
+    "pastebinAPIKey": "",
+    "pastebinUsername": "",
+    "pastebinPassword": "",
+    "spotifyAccessToken": "",
+    "bopOfTheDayChannel": "",
+    "wordleChannel": "",
+    "prefix": "..",
+    "permissions": {
         "moderator": [""],
         "admin": [""],
         "invoice": [""]
