@@ -57,6 +57,10 @@ client.on('message', function(message) {
 		tryParseSongIntoList(message);
 		return;
 	}
+	if (message.channel == config.wordleChannel) {
+		tryParseWordleIntoList(message);
+		return;
+	}
 	if(message.channel.type === 'DM') return;
 	if(!message.content.startsWith(client.prefix) || message.author.bot) return;
 	const args = message.content.slice(client.prefix.length).trim().split(/ +/);
@@ -112,6 +116,41 @@ client.on('message', function(message) {
 		message.reply('You don\'t have the permissions for that');
 	}
 });
+
+async function tryParseWordleIntoList(message) {
+	var messageContent = message.content;
+	// eslint-disable-next-line no-useless-escape
+	const regex = /^Wordle\s\d\d\d\s.\/\d/m;
+	if (regex.test(message.content)) {
+		const split = messageContent.split(' ', 3);
+		const attempt = split[2].substring(0, 1);
+		var wordleEntry = {
+			compositeKey : split[1] + '_' + message.author.id,
+			id : split[1],
+			submitterId : message.author.id,
+			attempt : attempt,
+			isHardMode : split[2].substring(3, 4) == '*',
+			success : attempt != 'x',
+		};
+		var success = tryAddWordleEntry(wordleEntry);
+		success ? message.react('✅') : message.reply('You\'ve already sent one today...');
+	}
+}
+
+function tryAddWordleEntry(entry) {
+// retrieve, deserialise, append, reserialise, persist
+	var data = JSON.parse(fs.readFileSync('./wordle.json'));
+	// data integrity checks --if someone's already submitted we're not going to let them do it again.
+
+	const found = data.entries.some(el => el.compositeKey === entry.compositeKey);
+	if (found) {
+		return false;
+	}
+	data.entries.push(entry);
+	var updatedData = JSON.stringify(data);
+	fs.writeFileSync('./wordle.json', updatedData);
+	return true;
+}
 
 
 async function tryParseSongIntoList(message) {
