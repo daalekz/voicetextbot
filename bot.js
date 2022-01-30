@@ -58,7 +58,13 @@ client.on('message', function(message) {
 		return;
 	}
 	if (message.channel == config.wordleChannel) {
-		tryParseWordleIntoList(message);
+		var result = tryParseWordle(message);
+		if (result) {
+			tryAddWordleEntry(result);
+			message.react('✅');
+		} else {
+			message.reply('You\'ve already sent one today...');
+		}
 		return;
 	}
 	if(message.channel.type === 'DM') return;
@@ -117,7 +123,7 @@ client.on('message', function(message) {
 	}
 });
 
-async function tryParseWordleIntoList(message) {
+async function tryParseWordle(message) {
 	var messageContent = message.content;
 	// eslint-disable-next-line no-useless-escape
 	const regex = /^Wordle\s\d\d\d\s.\/\d/m;
@@ -125,16 +131,19 @@ async function tryParseWordleIntoList(message) {
 		const split = messageContent.split(' ', 3);
 		const attempt = split[2].substring(0, 1);
 		var wordleEntry = {
+			timeStamp: Date.now(),
 			compositeKey : split[1] + '_' + message.author.id,
 			id : split[1],
 			submitterId : message.author.id,
 			attempt : attempt,
 			isHardMode : split[2].substring(3, 4) == '*',
-			success : attempt != 'x',
+			success : attempt != 'X',
 		};
-		var success = tryAddWordleEntry(wordleEntry);
-		success ? message.react('✅') : message.reply('You\'ve already sent one today...');
+		//todo better defensive coding because alex is an idiot --
+		// ie reasonable no. guesses, confirm that it is actually today's wordle, etc. 
+		return wordleEntry;
 	}
+	return null;
 }
 
 function tryAddWordleEntry(entry) {
