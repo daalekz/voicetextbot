@@ -161,6 +161,29 @@ function tryAddWordleEntry(entry) {
 	return true;
 }
 
+//gets the score for a user (total capture period possible guesses - how many they took)
+async function getWordleTotalGuesses(authorId) {
+	var data = JSON.parse(fs.readFileSync('./wordle.json'));
+	data.entries.filter(entry=>entry.authorId == authorId)
+}
+async function getNumDistinctWordles() {
+	var data = JSON.parse(fs.readFileSync('./wordle.json'));
+	const wordlesPossibleDuringCapturePeriod = data.hasMax(id) - data.hasMin(id);
+	return wordlesPossibleDuringCapturePeriod;
+}
+function getNumPossibleAttempts(numWordle) {
+	return numwordle * 6;
+}
+Array.prototype.hasMin = function(attrib) {
+	return (this.length && this.reduce(function(prev, curr){ 
+		return prev[attrib] < curr[attrib] ? prev : curr; 
+	})) || null;
+ }
+ Array.prototype.hasMax = function(attrib) {
+	return (this.length && this.reduce(function(prev, curr){ 
+		return prev[attrib] > curr[attrib] ? prev : curr; 
+	})) || null;
+ }
 
 async function tryParseSongIntoList(message) {
 	var messageContent = message.content;
