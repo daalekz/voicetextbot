@@ -1,7 +1,7 @@
-async function tryParseWordle(message) {
+exports.tryParseWordle = function tryParseWordle(message) {
 	var messageContent = message.content;
 	// eslint-disable-next-line no-useless-escape
-	const regex = /^Wordle\s\d\d\d\s.\/\d/m;
+	const regex = /^Wordle\s\d\d\d(\d)?\s[1-6X]\/\d/m;
 	if (regex.test(message.content)) {
 		const split = messageContent.split(' ', 3);
 		const attempt = split[2].substring(0, 1);
@@ -20,17 +20,14 @@ async function tryParseWordle(message) {
 }
 
 function validateWordleObj(entry) {
-	//reasonable attempt number
-	if (entry.success) {
-		return (entry.attempt >= 1 && entry.attempt <= 6);
-	}
-	//is from the last 2 days of wordles
-	var validationDate = Date.now.days() - entry.id;
-	const wordleAbsoluteStartDate = Date.parse('19-6-2021');
-	if (validationDate - wordleAbsoluteStartDate <= 2) return true;
+	// //is from the last 2 days of wordles
+	// var validationDate = Date.now.days() - entry.id;
+	// const wordleAbsoluteStartDate = Date.parse('19-6-2021');
+	// if (validationDate - wordleAbsoluteStartDate <= 2) return true;
+	return true;
 }
 
-function tryAddWordleEntry(entry) {
+exports.tryAddWordleEntry = function(entry) {
 	// retrieve, deserialise, append, reserialise, persist
 	var data = JSON.parse(fs.readFileSync('./wordle.json'));
 	// data integrity checks --if someone's already submitted we're not going to let them do it again.
