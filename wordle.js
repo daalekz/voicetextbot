@@ -1,3 +1,6 @@
+const fs = require('fs');
+
+
 exports.tryParseWordle = function tryParseWordle(message) {
 	var messageContent = message.content;
 	// eslint-disable-next-line no-useless-escape
