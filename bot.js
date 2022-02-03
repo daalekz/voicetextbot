@@ -54,22 +54,25 @@ client.on('voiceStateUpdate', function(oldVoiceState, newVoiceState) {
 });
 
 client.on('message', function(message) {
+	if(message.channel.type === 'DM' || message.author.bot) return;
+
 	if (message.channel == config.bopOfTheDayChannel) {
 		tryParseSongIntoList(message);
 		return;
 	}
+
 	if (message.channel == config.wordleChannel) {
 		var result = wordle.tryParseWordle(message);
 		if (result) {
 			wordle.tryAddWordleEntry(result);
 			message.react('✅');
-		} else {
+		}
+		else {
 			message.reply('You\'ve already sent one today...');
 		}
 		return;
 	}
-	if(message.channel.type === 'DM') return;
-	if(!message.content.startsWith(client.prefix) || message.author.bot) return;
+	if(!message.content.startsWith(client.prefix)) return;
 	const args = message.content.slice(client.prefix.length).trim().split(/ +/);
 	const commandName = args.shift().toLowerCase();
 	const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
@@ -123,7 +126,6 @@ client.on('message', function(message) {
 		message.reply('You don\'t have the permissions for that');
 	}
 });
-
 
 
 async function tryParseSongIntoList(message) {
