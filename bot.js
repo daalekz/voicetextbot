@@ -64,14 +64,16 @@ client.on('message', function(message) {
 	if (message.channel == config.wordleChannel) {
 		var result = wordle.tryParseWordle(message);
 		if (result) {
-			wordle.tryAddWordleEntry(result);
-			message.react('✅');
-		}
-		else {
-			message.reply('You\'ve already sent one today...');
+			if (wordle.tryAddWordleEntry(result)) {
+				message.react('✅');
+			}
+			else {
+				message.reply('Have you already sent one today?');
+			}
 		}
 		return;
 	}
+
 	if(!message.content.startsWith(client.prefix)) return;
 	const args = message.content.slice(client.prefix.length).trim().split(/ +/);
 	const commandName = args.shift().toLowerCase();
