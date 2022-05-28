@@ -14,6 +14,7 @@
     "eslint": "^8.8.0",
     "glob": "^7.2.0",
     "hastebin": "^0.2.1",
+    "node-schedule": "^2.1.0",
     "pastebin-ts": "^1.2.0",
     "spotify-web-api-node": "^5.0.2",
     "underscore": "^1.13.1"
