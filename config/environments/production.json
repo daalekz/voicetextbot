@@ -11,7 +11,7 @@
     "spotifyAccessToken": "",
     "bopOfTheDayChannel": "",
     "wordleChannel": "",
-    "prefix": "!",
+    "prefix": "..",
     "permissions": {
         "moderator": [""],
         "admin": [""],
