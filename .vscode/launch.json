@@ -14,12 +14,12 @@
             "request": "launch",
             "command": "npm run test",
             "cwd": "${workspaceFolder}"
-        }
+        },
         {
             "type": "node-terminal",
             "name": "Run Main",
             "request": "launch",
-            "command": "npm bot.js",
+            "command": "node bot.js",
             "cwd": "${workspaceFolder}"
         }
     ]
